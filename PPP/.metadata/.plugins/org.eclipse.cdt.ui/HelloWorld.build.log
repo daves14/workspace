@@ -1,0 +1,9 @@
+18:58:22 **** Rebuild of configuration Debug for project HelloWorld ****
+Info: Internal Builder is used for build
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -o main.o "..\\main.c" 
+gcc -o HelloWorld.exe main.o 
+c:/mingw/bin/../lib/gcc/mingw32/4.8.1/../../../../mingw32/bin/ld.exe: cannot open output file HelloWorld.exe: Permission denied
+collect2.exe: error: ld returned 1 exit status
+
+18:58:22 Build Finished (took 602ms)
+

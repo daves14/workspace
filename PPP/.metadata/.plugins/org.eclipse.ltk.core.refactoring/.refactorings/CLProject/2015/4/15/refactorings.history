@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;CLProject/Kernel/clkernel.cl&apos; to &apos;hello.cl&apos;" description="Rename resource &apos;clkernel.cl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Kernel/clkernel.cl" name="hello.cl" stamp="1428687269954" updateReferences="true"/>
+</session>

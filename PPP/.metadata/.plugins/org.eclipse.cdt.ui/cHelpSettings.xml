@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<cHelpSettings>
+<project name="HelloWorld">
+<provider id="org.eclipse.cdt.ui.provider1"/>
+<provider id="org.eclipse.linuxtools.cdt.libhover.provider">
+<book enabled="true" title="devhelp"/>
+<book enabled="true" title="glibc library"/>
+</provider>
+</project>
+<project name="CLProject">
+<provider id="org.eclipse.cdt.ui.provider1"/>
+<provider id="org.eclipse.linuxtools.cdt.libhover.provider">
+<book enabled="true" title="devhelp"/>
+<book enabled="true" title="glibc library"/>
+</provider>
+</project>
+<project name="OpenClProjekt">
+<provider id="org.eclipse.cdt.ui.provider1"/>
+<provider id="org.eclipse.linuxtools.cdt.libhover.provider">
+<book enabled="true" title="devhelp"/>
+<book enabled="true" title="glibc library"/>
+</provider>
+</project>
+<project name="001_HelloWorld_OpenCL">
+<provider id="org.eclipse.cdt.ui.provider1"/>
+<provider id="org.eclipse.linuxtools.cdt.libhover.provider">
+<book enabled="true" title="devhelp"/>
+<book enabled="true" title="glibc library"/>
+</provider>
+</project>
+<project name="002_Threads_OpenCL">
+<provider id="org.eclipse.cdt.ui.provider1"/>
+<provider id="org.eclipse.linuxtools.cdt.libhover.provider">
+<book enabled="true" title="devhelp"/>
+<book enabled="true" title="glibc library"/>
+</provider>
+</project>
+</cHelpSettings>

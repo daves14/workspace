@@ -1,0 +1,10 @@
+10:45:43 **** Incremental Build of configuration Debug for project CLProject ****
+Info: Internal Builder is used for build
+gcc "-IC:\\Program Files (x86)\\Intel\\OpenCL SDK\\2.0\\bin\\x86" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+..\Host\main.c:7:16: fatal error: cl.h: No such file or directory
+ #include <cl.h>
+                ^
+compilation terminated.
+
+10:45:43 Build Finished (took 172ms)
+

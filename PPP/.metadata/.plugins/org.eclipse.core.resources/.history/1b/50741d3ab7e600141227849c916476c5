@@ -1,0 +1,23 @@
+/*
+ * main.c
+ *
+ *  Created on: 19.04.2015
+ *      Author: David
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <CL/cl.h>
+
+#define MEM_SIZE (128)
+#define MAX_SOURCE_SIZE (0x100000)
+
+
+int main() {
+
+
+	return 0;
+}
+
+
+

@@ -1,0 +1,14 @@
+@CHARSET "ISO-8859-1";
+
+/* Formatting specific to the StockWatcher application */
+
+body {
+	padding: 10px;
+}
+
+/* stock list header row */
+.watchListHeader {
+	background-color: #2062B8;
+	color: white;
+	font-style: italic;
+}

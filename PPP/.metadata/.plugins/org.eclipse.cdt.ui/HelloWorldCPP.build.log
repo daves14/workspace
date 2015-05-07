@@ -1,0 +1,7 @@
+14:17:00 **** Clean-only build of configuration Debug for project HelloWorldCPP ****
+make clean 
+rm -rf  ./src/HelloWorldCPP.o  ./src/HelloWorldCPP.d  HelloWorldCPP.exe
+ 
+
+14:17:01 Build Finished (took 470ms)
+

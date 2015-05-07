@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move &apos;StockWatcher.css&apos; to &apos;war&apos;" description="Move &apos;StockWatcher.css&apos; to &apos;war&apos;" destination="war" element1="war/WEB-INF/StockWatcher.css" flags="7" id="org.eclipse.ltk.core.refactoring.move.resources" resources="1" stamp="1429978701315" updateReferences="true"/>
+</session>

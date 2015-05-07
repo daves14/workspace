@@ -1,0 +1,11 @@
+﻿Der Buildvorgang wurde am 10.04.2015 10:53:19 gestartet.
+     1>Projekt "D:\Studium\Master\workspace_PPP\OpenCLProject_001\OpenCLProject_001\OpenCLProject_001.vcxproj" auf Knoten "2", Build Ziel(e).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\David\Downloads\NVIDIA Corporation\NVIDIA GPU Computing SDK 4.0\OpenCL\common\inc" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\OpenCLProject_001.pch" /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>d:\studium\master\workspace_ppp\openclproject_001\openclproject_001\main.cpp(92): fatal error C1010: Unerwartetes Dateiende während der Suche nach dem vorkompilierten Header. Haben Sie möglicherweise vergessen, im Quellcode "#include "stdafx.h"" einzufügen?
+     1>Die Erstellung des Projekts "D:\Studium\Master\workspace_PPP\OpenCLProject_001\OpenCLProject_001\OpenCLProject_001.vcxproj" ist abgeschlossen, Build Ziel(e) -- FEHLER.
+
+Fehler beim Buildvorgang.
+
+Verstrichene Zeit 00:00:00.60
