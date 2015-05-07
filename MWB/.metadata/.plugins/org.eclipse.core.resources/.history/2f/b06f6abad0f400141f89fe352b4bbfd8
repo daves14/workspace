@@ -1,0 +1,44 @@
+@CHARSET "UTF-8";
+
+.gwt-TabLayoutPanel
+the panel itself
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTabs
+the tab bar element
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab
+an individual tab
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTabInner
+an element nested in each tab (useful for styling)
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelContent
+applied to all child content widgets
+
+.mainpanel {
+  border: 1px solid silver;
+  padding: 2px;
+  margin-bottom:6px;
+  width: 100%;
+}
+
+.browserpanel {
+  border: 1px solid silver;
+  padding: 2px;
+  margin-bottom:6px;
+  width: 100%;
+}
+
+.browserpanel td {
+  width: auto;
+}
+
+.menu {
+  border: 1px solid silver;
+  padding: 2px;
+  margin-bottom:6px;
+  width: 200px;
+}
+
+.configPanel {
+  border: 1px solid pink;
+  padding: 2px;
+  margin-bottom:6px;
+}
+

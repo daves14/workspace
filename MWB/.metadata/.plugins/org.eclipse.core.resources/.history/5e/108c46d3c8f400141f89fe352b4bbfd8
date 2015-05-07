@@ -1,0 +1,66 @@
+package de.simulator.client;
+
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.dom.client.Style.Unit;
+
+public class Simulator implements EntryPoint {
+	
+	/*
+	//Panels
+    private VerticalPanel menu = new VerticalPanel();
+    private VerticalPanel mainPanel = new VerticalPanel();
+    private HorizontalPanel browserPanel = new HorizontalPanel();
+    private HorizontalPanel configPanel = new HorizontalPanel();
+    //Buttons
+    private Button reloadButton = new Button("reload");
+    private Button runButton = new Button("run");
+    private Button pushButton = new Button("push");
+    //Labels
+    private Label title = new Label("Simulator");
+    private Label channels = new Label("Kanäle");
+    private Label test2 = new Label("Renderergebnis");
+    private Label test3 = new Label("Bibliothek");
+    private Label test4 = new Label("menu");
+    */
+	public void onModuleLoad() {
+	    // Attach two child widgets to a LayoutPanel, laying them out horizontally,
+	    // splitting at 50%.
+	    Widget childOne = new HTML("left"), childTwo = new HTML("right");
+	    LayoutPanel p = new LayoutPanel();
+	    p.add(childOne);
+	    p.add(childTwo);
+
+	    p.setWidgetLeftWidth(childOne, 0, com.google.gwt.dom.client.Style.Unit.PCT, 50, );
+	    p.setWidgetRightWidth(childTwo, 0, PCT, 50, PCT);
+
+	    // Attach the LayoutPanel to the RootLayoutPanel. The latter will listen for
+	    // resize events on the window to ensure that its children are informed of
+	    // possible size changes.
+	    RootLayoutPanel rp = RootLayoutPanel.get();
+	    rp.add(p);
+		/*
+		configPanel.add(test2);
+		configPanel.add(test3);
+		configPanel.addStyleName("configPanel");
+		
+		menu.add(test4);
+		menu.addStyleName("menu");
+		
+		mainPanel.add(configPanel);
+		mainPanel.add(channels);
+		mainPanel.addStyleName("mainpanel");
+		
+		browserPanel.add(menu);
+		browserPanel.add(mainPanel);
+		browserPanel.addStyleName("browserpanel");
+		
+		RootPanel.get("entry").add(title);
+		RootPanel.get("entry").add(browserPanel);
+		*/
+	}
+
+}

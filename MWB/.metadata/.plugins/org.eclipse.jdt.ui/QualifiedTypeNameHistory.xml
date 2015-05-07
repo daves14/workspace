@@ -4,4 +4,7 @@
 <fullyQualifiedTypeName name="de.schlebes.client.StockPriceService"/>
 <fullyQualifiedTypeName name="java.util.Random"/>
 <fullyQualifiedTypeName name="java.io.Serializable"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.ui.HTML"/>
+<fullyQualifiedTypeName name="com.google.gwt.dom.client.Style.Unit"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.ui.RootPanel"/>
 </qualifiedTypeNameHistroy>
