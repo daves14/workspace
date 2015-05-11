@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<item value="" key="org.eclipse.cdt.codan.internal.ui.preferences.CodanPreferencePage.selection"/>
+	<item value="hu.ngms.opencl.editor.checkers.global_declaration_error" key="org.eclipse.cdt.codan.internal.ui.preferences.CodanPreferencePage.selection"/>
 </section>

@@ -1,1 +1,7 @@
-Info: Nothing to build for 001_HelloWorld_OpenCL
+18:48:39 **** Rebuild of configuration Release for project 001_HelloWorld_OpenCL ****
+Info: Internal Builder is used for build
+gcc "-ID:\\Studium\\Master\\OpenCLSDK\\OpenCL\\common\\inc" -O3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+gcc "-LD:\\Studium\\Master\\OpenCLSDK\\OpenCL\\common\\lib\\Win32" -o 001_HelloWorld_OpenCL.exe "Host\\main.o" -lOpenCL 
+
+18:48:40 Build Finished (took 1s.20ms)
+

@@ -1,0 +1,36 @@
+10:59:56 **** Incremental Build of configuration Debug for project 002_Threads_OpenCL ****
+Info: Internal Builder is used for build
+gcc "-ID:\\Studium\\Master\\OpenCLSDK\\OpenCL\\common\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+..\Host\main.c: In function 'main':
+..\Host\main.c:135:2: warning: implicit declaration of function 'readOpenCLFile' [-Wimplicit-function-declaration]
+  readOpenCLFile(); // read OpenCL file into *stream
+  ^
+..\Host\main.c:159:13: warning: assignment from incompatible pointer type [enabled by default]
+   deviceIds = (cl_device_id) malloc(numDevices * sizeof(cl_device_id));
+             ^
+..\Host\main.c:206:10: warning: unused variable 'datasize' [-Wunused-variable]
+   size_t datasize = sizeof( double) * elements; // Datengröße auf Grundlage Anzahl der Elemente
+          ^
+..\Host\main.c:129:11: warning: unused variable 'event' [-Wunused-variable]
+  cl_event event;
+           ^
+..\Host\main.c:126:12: warning: unused variable 'local' [-Wunused-variable]
+     size_t local = 64;       // local domain size for our calculation
+            ^
+..\Host\main.c:125:12: warning: unused variable 'global' [-Wunused-variable]
+     size_t global;       // global domain size for our calculation
+            ^
+..\Host\main.c:106:13: warning: unused variable 'i' [-Wunused-variable]
+     cl_uint i;
+             ^
+..\Host\main.c: At top level:
+..\Host\main.c:394:6: warning: conflicting types for 'readOpenCLFile' [enabled by default]
+ void readOpenCLFile ()
+      ^
+..\Host\main.c:135:2: note: previous implicit declaration of 'readOpenCLFile' was here
+  readOpenCLFile(); // read OpenCL file into *stream
+  ^
+gcc "-LD:\\Studium\\Master\\OpenCLSDK\\OpenCL\\common\\lib\\Win32" -o 002_Threads_OpenCL.exe "Host\\myerror.o" "Host\\main.o" -lOpenCL 
+
+10:59:57 Build Finished (took 800ms)
+

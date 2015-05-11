@@ -1,121 +1,646 @@
-/*
- * main.c
- *
- *  Created on: 19.04.2015
- *      Author: David
- */
-
+#include <CL/cl.h>
+#include <CL/cl_platform.h>
+#include <math.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "myerror.h"
 
-#include <windows.h>
+//#define TIME_MEASUREMENT
 
-#include <CL/cl.h>
-
-
-#define MEM_SIZE (128)
-#define MAX_SOURCE_SIZE (0x100000)
-
-//Length of vectors
-int n = 100000;
-
-float *h_a;
-float *h_b;
-float *h_c;
-float *h_a2;
-float *h_b2;
-float *h_c2;
-
-cl_mem d_a;
-cl_mem d_b;
-cl_mem d_c;
-cl_mem d_a2;
-cl_mem d_b2;
-cl_mem d_c2;
+// OpenCL kernel. Each work item takes care of one element of c
+const char *kernelSource =                                      "\n" \
+"#pragma OPENCL EXTENSION cl_khr_fp64 : enable                    \n" \
+"__kernel void vecAdd(  __global double *a,                      \n" \
+"                       __global double *b,                      \n" \
+"                       __global double *c,                      \n" \
+"                       const unsigned int n)                    \n" \
+"{                                                               \n" \
+"    //Get our global thread ID                                  \n" \
+"    int id = get_global_id(0);                                  \n" \
+"                                                                \n" \
+"    //Make sure we do not go out of bounds                      \n" \
+"    if (id < n) {                                               \n" \
+"        c[id] = a[id] + b[id];                                  \n" \
+"	}                                                            \n" \
+"}                                                               \n" \
+                                                                "\n" ;
 
 
-int main() {
-	cl_device_id device_id = NULL;
-	cl_context context = NULL;
-	cl_command_queue command_queue = NULL;
-	cl_mem memobj = NULL;
-	cl_program program = NULL;
-	cl_kernel kernel = NULL;
-	cl_platform_id platform_id = NULL;
-	cl_uint ret_num_devices;
-	cl_uint ret_num_platforms;
-	cl_int ret;
-n = 10;
-	char string[MEM_SIZE];
+char *stream;
 
-	FILE *fp;
-	char fileName[] = "./Kernel/HelloWorld.cl";
-	char *source_str;
-	size_t source_size;
+void run (int numDevices, cl_device_id *deviceIDs, cl_platform_id* platformIds);
 
-	/* Load the source code containing the kernel*/
-	fp = fopen(fileName, "r");
-	if (!fp) {
-		fprintf(stderr, "Failed to load kernel.\n");
-		exit(1);
+
+/*
+	Infos über die Patter suchen.
+	Zuerst die Größe der Patter holen
+	Dann den Inhalt der Patter holen
+*/
+void DisplayPlatformInfo( cl_platform_id id, cl_platform_info name, char* str)
+{
+	cl_int err;
+	size_t paramValueSize;
+	char * info;
+
+	// Größe des Pattern holen
+	err = clGetPlatformInfo( id, name, 0, NULL, &paramValueSize);
+	if ( err != CL_SUCCESS)
+	{
+		fprintf(stderr, "Failed to find OpenCL platform %s\n", str);
+		return;
 	}
-	source_str = (char*) malloc(MAX_SOURCE_SIZE);
-	source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
-	fclose(fp);
 
-	/* Get Platform and Device Info */
-	ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id,
-			&ret_num_devices);
+	// Speicher in Größe des Pattern holen
+	info = (char *)malloc( sizeof( char) * paramValueSize);
 
-	/* Create OpenCL context */
-	context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
+	// Inhalt der Größe des Pattern holen
+	err = clGetPlatformInfo( id, name, paramValueSize, info, NULL);
+	if ( err != CL_SUCCESS)
+	{
+		openClFehler( err);
+		fprintf( stderr,"Failed to find OpenCL platform %s\n",str);
+		return;
+	}
+	printf( "%s\t%s\n", str, info);
+	free( info);
+}
 
-	/* Create Command Queue */
-	command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+void DisplayDeviceInfo(cl_device_id id, cl_device_info name, char* str)
+{
+        cl_int err;
+        size_t paramValueSize;
+        cl_uint info;
 
-	/* Create Memory Buffer */
-	memobj = clCreateBuffer(context, CL_MEM_READ_WRITE, MEM_SIZE * sizeof(char),
-			NULL, &ret);
+//	err = clGetDeviceInfo( id, name, 0, NULL, &paramValueSize);
+//	openClFehler(err);
+        // Größe des Pattern holen
+        err = clGetDeviceInfo(id,name,0,NULL,&paramValueSize);
+        if (err != CL_SUCCESS)
+        {
+		openClFehler(err);
+                fprintf(stderr, "Failed to find OpenCL platform %s\n", str);
+                return;
+        }
+        // Speicher in Größe des Pattern holen
+        // Inhalt der Größe des Pattern holen
 
-	/* Create Kernel Program from the source */
-	program = clCreateProgramWithSource(context, 1, (const char **) &source_str,
-			(const size_t *) &source_size, &ret);
+ 	err = clGetDeviceInfo(id,name,paramValueSize,&info,NULL);
+        if (err != CL_SUCCESS)
+        {
+		openClFehler(err);
+                fprintf(stderr,"Failed to find OpenCL platform %s\n",str);;
+                return;
+        }
 
-	/* Build Kernel Program */
-	ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
-
-	/* Create OpenCL Kernel */
-	kernel = clCreateKernel(program, "hello", &ret);
-
-	/* Set OpenCL Kernel Parameters */
-	ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&memobj);
-
-	/* Execute OpenCL Kernel */
-	ret = clEnqueueTask(command_queue, kernel, 0, NULL,NULL);
-
-	/* Copy results from the memory buffer */
-	ret = clEnqueueReadBuffer(command_queue, memobj, CL_TRUE, 0,
-	MEM_SIZE * sizeof(char), string, 0, NULL, NULL);
-
-	/* Display Result */
-	puts(string);
-
-	/* Finalization */
-	ret = clFlush(command_queue);
-	ret = clFinish(command_queue);
-	ret = clReleaseKernel(kernel);
-	ret = clReleaseProgram(program);
-	ret = clReleaseMemObject(memobj);
-	ret = clReleaseCommandQueue(command_queue);
-	ret = clReleaseContext(context);
-
-	free(source_str);
-
-	system("Pause");
-
-	return EXIT_SUCCESS;
+        printf("%s\t%d\n", str, info);
 }
 
 
+int main(int argc, char** argv) {
 
+	// OpenCL Deklarationen
+	// ==================================================
+    cl_int err;							// error code returned from api calls
+
+    cl_uint i;
+    cl_uint numPlatforms;				// Anzahl der OpenCL Plattformen
+	cl_uint numDevices = 0;
+    cl_platform_id * platformIds;
+    cl_context context = NULL;
+    cl_device_id * deviceIds;		// compute device id
+
+
+
+	//cl_int err = 0;							// error code returned from api calls
+	//cl_context context = NULL;				// compute context
+	cl_command_queue commandQueue = NULL;	// compute command queue
+    cl_program program = NULL;				// compute programm
+    cl_kernel kernel = NULL;				// compute kernel
+
+    cl_mem input_a = NULL;					// input buffer
+    cl_mem input_b = NULL;					// input buffer
+    cl_mem output = NULL;					// output buffer
+
+    size_t global;							// global domain size for our calculation
+    size_t local = 64;							// local domain size for our calculation
+
+	//unsigned int i;
+	cl_event event;
+    // ==================================================
+
+
+	// Datei einlesen
+	printf( "start reading OpenCL File\n");
+	readOpenCLFile();	// read OpenCL file into *stream
+	printf( "finish reading OpenCL File\n");
+
+
+
+    err = clGetPlatformIDs( 0, NULL, &numPlatforms); // Anzahl der OpenCL Plattformen welche genutzt werden können in "numPlatforms"
+    // Prüfen ob mehr wie 0 Plattformen gefunden wurden
+    if ( err != CL_SUCCESS || numPlatforms <= 0) {
+    	openClFehler(err);
+   		fprintf(stderr, "Failed to find any OpenCL platform.\n");
+   		return 0;
+    }
+
+	platformIds = ( cl_platform_id *) malloc( sizeof( cl_platform_id) * numPlatforms);
+	err = clGetPlatformIDs( numPlatforms, platformIds, NULL);
+	if ( err != CL_SUCCESS) {
+		fprintf( stderr, "Failed to find any OpenCL platforms.\n");
+		return 0;
+	}
+
+	err = clGetDeviceIDs( platformIds[0], CL_DEVICE_TYPE_GPU, 0, NULL, &numDevices);
+	if (numDevices < 1) {
+		fprintf( stderr, "keine GPU vorhanden\n");
+	} else {
+		deviceIds = (cl_device_id) malloc(numDevices * sizeof(cl_device_id));
+		printf("Anzahl der GPUs: %d\n", numDevices);
+	}
+	if (err != CL_SUCCESS) {
+		openClFehler(err);
+		fprintf( stderr, "Fail to find any OpenCL Device. \n");
+		return 0;
+	}
+	err = clGetDeviceIDs( platformIds[0], CL_DEVICE_TYPE_GPU, 1, deviceIds,	NULL);
+	if (err != CL_SUCCESS) {
+		openClFehler(err);
+		return 0;
+	}
+
+/*
+    printf("======= Plattform Infos ==========\n");
+	printf("number of platforms: %d\n", numPlatforms);
+
+	for ( i = 0; i < numPlatforms; i++) {
+		printf("======= Plattform - %d - ==========\n", ( i+1));
+		DisplayPlatformInfo( platformIds[i], CL_PLATFORM_PROFILE, "CL_PLATFORM_PROFILE");
+		DisplayPlatformInfo( platformIds[i], CL_PLATFORM_VERSION, "CL_PLATFORM_VERSION");
+		DisplayPlatformInfo( platformIds[i], CL_PLATFORM_VENDOR, "CL_PLATFORM_VENDOR");
+		DisplayPlatformInfo( platformIds[i], CL_PLATFORM_NAME, "CL_PLATFORM_NAME");
+		DisplayPlatformInfo( platformIds[i], CL_PLATFORM_EXTENSIONS, "CL_PLATFORM_EXTENSIONS");
+	}
+	printf("===================================\n\n");
+
+	printf("======= Device Infos ==========\n");
+	for (i = 0; i < numDevices; i++) {
+		DisplayDeviceInfo( deviceIds[0], CL_DEVICE_VENDOR_ID, "CL_DEVICE_VENDOR_ID");
+		DisplayDeviceInfo( deviceIds[0], CL_DEVICE_MAX_COMPUTE_UNITS, "CL_DEVICE_MAX_COMPUTE_UNITS");
+		DisplayDeviceInfo( deviceIds[0], CL_DEVICE_TYPE, "CL_DEVICE_TYPE");
+		DisplayDeviceInfo( deviceIds[0], CL_DEVICE_IMAGE_SUPPORT, "CL_DEVICE_IMAGE_SUPORT");
+		DisplayDeviceInfo( deviceIds[0], CL_DEVICE_ADDRESS_BITS, "CL_DEVICE_ADDRESS_BITS");
+	}
+	char ret_string[1024];
+	clGetDeviceInfo( deviceIds[0], CL_DEVICE_NAME, sizeof(ret_string), &ret_string, NULL);
+	printf("CL_DEVICE_NAME: \t\t\t%s\n\n\n", ret_string);
+
+	//run(numDevices, deviceIds, platformIds);
+
+*/
+
+
+
+		const unsigned int elements = 100;					// Anzahl der Elemente
+		size_t datasize = sizeof( double) * elements;	// Datengröße auf Grundlage Anzahl der Elemente
+
+
+	// Create a compute context
+	context = clCreateContext( 0, 1, deviceIds, NULL, NULL, &err);
+	if ( context == NULL || err != CL_SUCCESS)
+	{
+		openClFehler( err);
+		printf( "ERROR: Failed at clCreateContext()\n");
+		return 0;
+	}
+	printf( "OpenCL context created\n");
+
+	// Create OpenCL command queue
+	#ifdef TIME_MEASUREMENT
+		// mit Zeitmessung
+		commandQueue = clCreateCommandQueue( context, deviceIDs[0], CL_QUEUE_PROFILING_ENABLE, &err);
+	#else
+		// ohne Zeitmessung
+		commandQueue = clCreateCommandQueue( context, deviceIds[0], 0, &err);
+	#endif
+	if ( commandQueue == NULL || err != CL_SUCCESS)
+	{
+		openClFehler( err);
+		printf( "ERROR: Failed at clCreateCommandQueue()\n()\n");
+		return 0;
+	}
+	printf( "OpenCL command queue created\n");
+
+	// Programm Source einlesen
+	program = clCreateProgramWithSource( context, 1, ( const char**)&kernelSource, NULL, &err);
+	if( err != CL_SUCCESS || program == NULL)
+	{
+		printf( "ERROR bei CreateProgramWithSource()\n");
+		openClFehler( err);
+		return 0;
+	}
+
+	// Eingelesenes Programm builden
+	err = clBuildProgram( program, numDevices, deviceIds, NULL, NULL, NULL);
+	//err = clBuildProgram( program, 0, NULL, NULL, NULL, NULL);
+	if( err != CL_SUCCESS)
+	{
+		printf( "ERROR bei BuildProgramm()\n");
+		openClFehler( err);
+		return 0;
+	}
+
+	// Kernel bauen, mit der Funktion vecAdd
+	kernel = clCreateKernel( program, "vecAdd", &err);
+
+	/*
+		// Buffer anlegen, für die Übergabe an die Grafikkarte
+		input_a = clCreateBuffer( context, CL_MEM_READ_ONLY, datasize, NULL, &err);
+		if( !input_a || err != CL_SUCCESS)
+			openClFehler( err);
+		input_b = clCreateBuffer( context, CL_MEM_READ_ONLY, datasize, NULL, &err);
+		if( !input_b || err != CL_SUCCESS)
+			openClFehler( err);
+		output = clCreateBuffer( context, CL_MEM_WRITE_ONLY, datasize, NULL, &err);
+		if( !output || err != CL_SUCCESS)
+			openClFehler( err);
+
+
+
+		// =============================
+
+		double *A = NULL;
+		double *B = NULL;
+		double *C = NULL;
+
+		A=( double *)malloc( datasize);
+		B=( double *)malloc( datasize);
+		C=( double *)malloc( datasize);
+
+		// Arrays füllen
+		for( i=0; i < elements; i++)
+		{
+			A[i] = sin(i)*sin(i);
+			B[i] = cos(i)*cos(i);
+			C[i] = 0;
+		}
+
+
+		// Write Buffer anlegen
+		err = clEnqueueWriteBuffer( commandQueue, input_a, CL_TRUE, 0, datasize, A, 0, NULL, NULL);
+		if( err != CL_SUCCESS )
+		{
+			printf( "ERROR: at clenqueueWriteBuffer()\n");
+			openClFehler( err);
+		}
+		err = clEnqueueWriteBuffer( commandQueue, input_b, CL_TRUE, 0, datasize, B, 0, NULL, NULL);
+		if( err != CL_SUCCESS )
+		{
+			printf( "ERROR: at clenqueueWriteBuffer()\n");
+			openClFehler( err);
+		}
+
+
+
+
+		//Kernel Argumenete Setzten
+	    err = clSetKernelArg( kernel, 0, sizeof( cl_mem), &input_a);
+		if( err != CL_SUCCESS)
+			openClFehler( err);
+	    err = clSetKernelArg( kernel, 1, sizeof( cl_mem), &input_b);
+		if( err != CL_SUCCESS)
+			openClFehler( err);
+	    err = clSetKernelArg( kernel, 2, sizeof( cl_mem), &output);
+		if( err != CL_SUCCESS)
+			openClFehler( err);
+	    err = clSetKernelArg( kernel, 3, sizeof( unsigned int), &elements);
+		if( err != CL_SUCCESS)
+			openClFehler( err);
+
+	    global=elements;
+		//global = ceil( elements / (float)local)*local;
+
+
+		// Programm ausführen
+	#ifdef TIME_MEASUREMENT
+	    err = clEnqueueNDRangeKernel( commandQueue, kernel, 1, NULL, &global, &local, 0, NULL, &event);
+		clWaitForEvents( 1 , &event);
+	#else
+	    err = clEnqueueNDRangeKernel( commandQueue, kernel, 1, NULL, &global, &local, 0, NULL, NULL);
+	#endif
+
+	#ifdef TIME_MEASUREMENT
+		// Zeit zurück setzen
+		clFinish( commandQueue);
+	#endif
+
+		// Ergebniss Buffer wieder einlesen
+	    //
+	    err = clEnqueueReadBuffer( commandQueue, output, CL_TRUE, 0, datasize, C, 0, NULL, NULL);
+	    if ( err != CL_SUCCESS)
+	    {
+	    	openClFehler( err);
+	        printf( "ERROR: Failed to read output array! clEnqueueReadBuffer()\n");
+	    }
+
+	    double sum = 0;
+	    for( i=0; i<elements; i++)
+	    {
+	    	sum += C[i];
+	    }
+
+	    // Ergebnisausgabe
+		//printf("Summe A: 0 bis B:%d = %d\n",elements, sum/elements);
+	    printf("Summe A: 0 bis B:%d = %d\n",elements, sum/elements);
+
+		//float f = ( ( ( elements - 1) * ( elements - 1)) + ( elements - 1)) / 2;
+		//printf( "Vergleich (kleiner Gauß): %f\n", f);
+
+
+	#ifdef TIME_MEASUREMENT
+		cl_ulong time_start, time_end;
+		double total_time;
+		// Startzeit holen
+		clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof( time_start), &time_start, NULL);
+		// Endzeit holen
+		clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof( time_end), &time_end, NULL);
+		// Zeit differenz ausrechnen
+		total_time = time_end - time_start;
+		printf( "\nBenötigte Zeit auf der GPU = %0.3f ms\n", (total_time / 1000000.0) );
+	#endif
+
+
+		// cleanup
+		//
+		free( stream);
+		free( A);
+		free( C);
+*/
+		clReleaseMemObject( input_a);
+		clReleaseMemObject( input_b);
+		clReleaseMemObject( output);
+		clReleaseProgram( program);
+		clReleaseKernel( kernel);
+		clReleaseCommandQueue( commandQueue);
+		clReleaseContext( context);
+
+	free(platformIds);
+
+	return 0; // main() end
+}
+
+
+void readOpenCLFile ()
+{
+	/*
+	FILE *file;
+	unsigned int size;
+
+	file = fopen( "./Kernel/reduction.cl","rb");
+	fseek( file, 0, SEEK_END);
+	size = ftell( file);
+	stream = calloc( size +1, 1);
+	fseek( file, 0, SEEK_SET);
+	fread( stream, 1, size, file);
+	printf("\n\n======================================================================\n");
+	printf("START openCL Programm:\n%s\n",stream);
+	printf("\n==ENDE OpenCL Programm================================================\n");
+	*/
+
+	FILE *file;
+	unsigned int size;
+
+	file = fopen( "./Kernel/kernel.cl","rb");
+	fseek( file, 0, SEEK_END);
+	size = ftell( file);
+	fseek( file, 0, SEEK_SET);
+	stream = calloc( size+1,1);
+	fread( stream, 1, size, file);
+	fclose( file);
+	printf("\n\n======================================================================\n");
+	printf("START openCL Programm:\n%s\n", stream);
+	printf("\n==ENDE OpenCL Programm================================================\n");
+
+}
+
+
+/*
+void run ( int numDevices, cl_device_id* deviceIDs, cl_platform_id* platformIds)
+{
+
+	 =====================================================================
+	 * Variablen
+	 * =====================================================================
+
+	cl_int err = 0;							// error code returned from api calls
+	cl_context context = NULL;				// compute context
+	cl_command_queue commandQueue = NULL;	// compute command queue
+    cl_program program = NULL;				// compute programm
+    cl_kernel kernel = NULL;				// compute kernel
+
+    cl_mem input_a = NULL;					// input buffer
+    cl_mem input_b = NULL;					// input buffer
+    cl_mem output = NULL;					// output buffer
+
+    size_t global;							// global domain size for our calculation
+    size_t local = 64;							// local domain size for our calculation
+
+	unsigned int i;
+	cl_event event;
+	 =====================================================================
+	 * Variablen ENDE
+	 * =====================================================================
+
+
+	const unsigned int elements = 100;					// Anzahl der Elemente
+	size_t datasize = sizeof( double) * elements;	// Datengröße auf Grundlage Anzahl der Elemente
+
+
+// Create a compute context
+	context = clCreateContext( 0, numDevices, deviceIDs, NULL, NULL, &err);
+	if ( context == NULL || err != CL_SUCCESS)
+	{
+		openClFehler( err);
+		printf( "ERROR: Failed at clCreateContext()\n");
+		return;
+	}
+	printf( "OpenCL context created\n");
+
+// Create OpenCL command queue
+#ifdef TIME_MEASUREMENT
+	// mit Zeitmessung
+	commandQueue = clCreateCommandQueue( context, deviceIDs[0], CL_QUEUE_PROFILING_ENABLE, &err);
+#else
+	// ohne Zeitmessung
+	commandQueue = clCreateCommandQueue( context, deviceIDs[0], 0, &err);
+#endif
+	if ( commandQueue == NULL || err != CL_SUCCESS)
+	{
+		openClFehler( err);
+		printf( "ERROR: Failed at clCreateCommandQueue()\n()\n");
+		return;
+	}
+	printf( "OpenCL command queue created\n");
+
+// Datei einlesen
+	printf( "start reading OpenCL File\n");
+	readOpenCLFile();	// read OpenCL file into *stream
+	printf( "finish reading OpenCL File\n");
+
+// Programm Source einlesen
+	program = clCreateProgramWithSource( context, 1, ( const char**)&kernelSource, NULL, &err);
+	if( err != CL_SUCCESS || program == NULL)
+	{
+		printf( "ERROR bei CreateProgramWithSource()\n");
+		openClFehler( err);
+		return;
+	}
+
+// Eingelesenes Programm builden
+	//err = clBuildProgram( program, numDevices, deviceIDs, NULL, NULL, NULL);
+	err = clBuildProgram( program, 0, NULL, NULL, NULL, NULL);
+	if( err != CL_SUCCESS)
+	{
+		printf( "ERROR bei BuildProgramm()\n");
+		openClFehler( err);
+		return;
+	}
+
+// Kernel bauen, mit der Funktion vecAdd
+	kernel = clCreateKernel( program, "vecAdd", &err);
+
+
+	// Buffer anlegen, für die Übergabe an die Grafikkarte
+	input_a = clCreateBuffer( context, CL_MEM_READ_ONLY, datasize, NULL, &err);
+	if( !input_a || err != CL_SUCCESS)
+		openClFehler( err);
+	input_b = clCreateBuffer( context, CL_MEM_READ_ONLY, datasize, NULL, &err);
+	if( !input_b || err != CL_SUCCESS)
+		openClFehler( err);
+	output = clCreateBuffer( context, CL_MEM_WRITE_ONLY, datasize, NULL, &err);
+	if( !output || err != CL_SUCCESS)
+		openClFehler( err);
+
+
+
+	// =============================
+
+	double *A = NULL;
+	double *B = NULL;
+	double *C = NULL;
+
+	A=( double *)malloc( datasize);
+	B=( double *)malloc( datasize);
+	C=( double *)malloc( datasize);
+
+	// Arrays füllen
+	for( i=0; i < elements; i++)
+	{
+		A[i] = sin(i)*sin(i);
+		B[i] = cos(i)*cos(i);
+		C[i] = 0;
+	}
+
+
+	// Write Buffer anlegen
+	err = clEnqueueWriteBuffer( commandQueue, input_a, CL_TRUE, 0, datasize, A, 0, NULL, NULL);
+	if( err != CL_SUCCESS )
+	{
+		printf( "ERROR: at clenqueueWriteBuffer()\n");
+		openClFehler( err);
+	}
+	err = clEnqueueWriteBuffer( commandQueue, input_b, CL_TRUE, 0, datasize, B, 0, NULL, NULL);
+	if( err != CL_SUCCESS )
+	{
+		printf( "ERROR: at clenqueueWriteBuffer()\n");
+		openClFehler( err);
+	}
+
+
+
+
+	//Kernel Argumenete Setzten
+    err = clSetKernelArg( kernel, 0, sizeof( cl_mem), &input_a);
+	if( err != CL_SUCCESS)
+		openClFehler( err);
+    err = clSetKernelArg( kernel, 1, sizeof( cl_mem), &input_b);
+	if( err != CL_SUCCESS)
+		openClFehler( err);
+    err = clSetKernelArg( kernel, 2, sizeof( cl_mem), &output);
+	if( err != CL_SUCCESS)
+		openClFehler( err);
+    err = clSetKernelArg( kernel, 3, sizeof( unsigned int), &elements);
+	if( err != CL_SUCCESS)
+		openClFehler( err);
+
+    global=elements;
+	//global = ceil( elements / (float)local)*local;
+
+
+	// Programm ausführen
+#ifdef TIME_MEASUREMENT
+    err = clEnqueueNDRangeKernel( commandQueue, kernel, 1, NULL, &global, &local, 0, NULL, &event);
+	clWaitForEvents( 1 , &event);
+#else
+    err = clEnqueueNDRangeKernel( commandQueue, kernel, 1, NULL, &global, &local, 0, NULL, NULL);
+#endif
+
+#ifdef TIME_MEASUREMENT
+	// Zeit zurück setzen
+	clFinish( commandQueue);
+#endif
+
+	// Ergebniss Buffer wieder einlesen
+    //
+    err = clEnqueueReadBuffer( commandQueue, output, CL_TRUE, 0, datasize, C, 0, NULL, NULL);
+    if ( err != CL_SUCCESS)
+    {
+    	openClFehler( err);
+        printf( "ERROR: Failed to read output array! clEnqueueReadBuffer()\n");
+    }
+
+    double sum = 0;
+    for( i=0; i<elements; i++)
+    {
+    	sum += C[i];
+    }
+
+    // Ergebnisausgabe
+	//printf("Summe A: 0 bis B:%d = %d\n",elements, sum/elements);
+    printf("Summe A: 0 bis B:%d = %d\n",elements, sum/elements);
+
+	//float f = ( ( ( elements - 1) * ( elements - 1)) + ( elements - 1)) / 2;
+	//printf( "Vergleich (kleiner Gauß): %f\n", f);
+
+
+#ifdef TIME_MEASUREMENT
+	cl_ulong time_start, time_end;
+	double total_time;
+	// Startzeit holen
+	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof( time_start), &time_start, NULL);
+	// Endzeit holen
+	clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof( time_end), &time_end, NULL);
+	// Zeit differenz ausrechnen
+	total_time = time_end - time_start;
+	printf( "\nBenötigte Zeit auf der GPU = %0.3f ms\n", (total_time / 1000000.0) );
+#endif
+
+
+	// cleanup
+	//
+	free( stream);
+	free( A);
+	free( C);
+
+	clReleaseMemObject( input_a);
+	clReleaseMemObject( input_b);
+	clReleaseMemObject( output);
+	clReleaseProgram( program);
+	clReleaseKernel( kernel);
+	clReleaseCommandQueue( commandQueue);
+	clReleaseContext( context);
+
+	return; // function run() end
+}
+*/

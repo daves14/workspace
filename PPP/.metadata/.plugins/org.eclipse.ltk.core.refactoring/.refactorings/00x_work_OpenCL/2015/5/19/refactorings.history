@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;00x_work_OpenCL/Kernel/kernel.cl&apos; to &apos;reduction.cl&apos;" description="Rename resource &apos;kernel.cl&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Kernel/kernel.cl" name="reduction.cl" stamp="1431167991903" updateReferences="true"/>
+</session>

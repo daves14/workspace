@@ -1,24 +1,17 @@
-14:26:15 **** Incremental Build of configuration Debug for project OpenCL_Devices ****
+13:13:50 **** Incremental Build of configuration Debug for project OpenCL_vecadd_parallel ****
 Info: Internal Builder is used for build
-gcc "-ID:\\Studium\\Master\\OpenCLSDK\\OpenCL\\common\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
-..\Host\main.c: In function 'main':
-..\Host\main.c:127:7: warning: unknown conversion type character 'l' in format [-Wformat=]
-       printf("  DEVICE_GLOBAL_MEM_SIZE = %llu\n", (unsigned long long)buf_ulong);
-       ^
-..\Host\main.c:127:7: warning: too many arguments for format [-Wformat-extra-args]
-..\Host\main.c:141:3: warning: passing argument 4 of 'clCreateContext' from incompatible pointer type [enabled by default]
-   context = CL_CHECK_ERR(clCreateContext(NULL, 1, &devices[device_no], &pfn_notify, NULL, &_err));
-   ^
-In file included from ..\Host\main.c:25:0:
-D:\Studium\Master\OpenCLSDK\OpenCL\common\inc/CL/cl.h:476:1: note: expected 'void (__attribute__((__stdcall__)) *)(const char *, const void *, size_t,  void *)' but argument is of type 'void (*)(const char *, const void *, size_t,  void *)'
- clCreateContext(const cl_context_properties * /* properties */,
- ^
-..\Host\main.c:141:3: warning: passing argument 4 of 'clCreateContext' from incompatible pointer type [enabled by default]
-   context = CL_CHECK_ERR(clCreateContext(NULL, 1, &devices[device_no], &pfn_notify, NULL, &_err));
-   ^
-In file included from ..\Host\main.c:25:0:
-D:\Studium\Master\OpenCLSDK\OpenCL\common\inc/CL/cl.h:476:1: note: expected 'void (__attribute__((__stdcall__)) *)(const char *, const void *, size_t,  void *)' but argument is of type 'void (*)(const char *, const void *, size_t,  void *)'
- clCreateContext(const cl_context_properties * /* properties */,
- ^
-gcc "-LD:\\Studium\\Master\\OpenCLSDK\\OpenCL\\common\\lib\\Win32" -o OpenCL_Devices.exe "Host\\main.o" -lOpenCL 
-Info: Nothing to build for OpenCL_Devices
+gcc "-ID:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+gcc "-LD:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\lib\\Win32" -o OpenCL_vecadd_parallel.exe "Host\\main.o" -lOpenCL -lpthread 
+Info: Nothing to build for OpenCL_vecadd_parallel
+13:20:18 **** Incremental Build of configuration Debug for project OpenCL_vecadd_parallel ****
+Info: Internal Builder is used for build
+gcc "-ID:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+gcc "-LD:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\lib\\Win32" -o OpenCL_vecadd_parallel.exe "Host\\main.o" -lOpenCL -lpthread 
+13:20:47 **** Incremental Build of configuration Debug for project OpenCL_vecadd_parallel ****
+Info: Internal Builder is used for build
+gcc "-ID:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+gcc "-LD:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\lib\\Win32" -o OpenCL_vecadd_parallel.exe "Host\\main.o" -lOpenCL -lpthread 
+13:21:03 **** Incremental Build of configuration Debug for project OpenCL_vecadd_parallel ****
+Info: Internal Builder is used for build
+gcc "-ID:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+gcc "-LD:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\lib\\Win32" -o OpenCL_vecadd_parallel.exe "Host\\main.o" -lOpenCL -lpthread 

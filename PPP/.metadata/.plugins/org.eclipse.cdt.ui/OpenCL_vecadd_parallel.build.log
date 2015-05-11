@@ -1,0 +1,7 @@
+13:21:03 **** Incremental Build of configuration Debug for project OpenCL_vecadd_parallel ****
+Info: Internal Builder is used for build
+gcc "-ID:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\inc" -O0 -g3 -Wall -c -fmessage-length=0 -o "Host\\main.o" "..\\Host\\main.c" 
+gcc "-LD:\\Studium\\Master\\libs\\OpenCLSDK\\OpenCL\\lib\\Win32" -o OpenCL_vecadd_parallel.exe "Host\\main.o" -lOpenCL -lpthread 
+
+13:21:04 Build Finished (took 827ms)
+

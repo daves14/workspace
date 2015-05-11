@@ -1,1 +1,8 @@
-Info: Nothing to build for HelloWorldTest
+18:48:42 **** Rebuild of configuration Debug for project HelloWorldTest ****
+Info: Internal Builder is used for build
+cl /c /EHs /MD /Zi /nologo /Fofile.obj "..\\file.c" 
+file.c
+link /debug /nologo /OUT:HelloWorldTest.exe file.obj 
+
+18:48:42 Build Finished (took 810ms)
+
